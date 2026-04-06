@@ -45,30 +45,56 @@ const auth = (() => {
         const errorDiv = document.getElementById('loginError');
 
         try {
-            errorDiv.textContent = '';
+            errorDiv.textContent = 'Connecting...';
+            
+            // Always try registration/login with correct endpoint
+            let endpoint = '/auth/register'; // Default to register
             
             // Try login first
             let response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ username, password })
+            }).catch(err => {
+                console.error('Login fetch error:', err);
+                return { ok: false, statusText: 'Network Error: ' + err.message };
             });
+
+            console.log('Login response status:', response.status, response.statusText);
 
             // If login fails, try registration
             if (!response.ok) {
+                console.log('Login failed, trying registration...');
                 response = await fetch(`${API_URL}/auth/register`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ username, password })
+                }).catch(err => {
+                    console.error('Registration fetch error:', err);
+                    throw new Error('Network Error: ' + err.message);
                 });
+                
+                console.log('Register response status:', response.status);
             }
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Authentication failed');
+                const errorText = await response.text();
+                console.error('Response error text:', errorText);
+                try {
+                    const error = JSON.parse(errorText);
+                    throw new Error(error.message || `Server error: ${response.status} ${response.statusText}`);
+                } catch (e) {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
             }
 
             const data = await response.json();
+            console.log('Auth success, user:', data.user);
+            
             token = data.token;
             currentUser = data.user;
 
@@ -80,11 +106,12 @@ const auth = (() => {
                 document.getElementById('adminPanelBtn').classList.remove('hidden');
             }
 
+            errorDiv.textContent = '';
             switchScreen('chatScreen');
             chat.initialize();
 
         } catch (error) {
-            errorDiv.textContent = error.message;
+            errorDiv.textContent = error.message || 'Authentication failed';
             console.error('Login error:', error);
         }
     };
