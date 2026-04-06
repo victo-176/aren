@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANON - Terminal Messaging System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="terminal-container login-container">
+                <div class="terminal-header">
+                    <span class="terminal-title">ANON_LOGIN_SYSTEM v2.1</span>
+                    <span class="terminal-buttons">
+                        <span class="button minimize">_</span>
+                        <span class="button maximize">□</span>
+                        <span class="button close">✕</span>
+                    </span>
+                </div>
+                <div class="terminal-content">
+                    <div class="scan-line"></div>
+                    <div class="terminal-text">
+                        <p class="glitch" data-glitch="ANON_LOGIN_SYSTEM v2.1">ANON_LOGIN_SYSTEM v2.1</p>
+                        <p>Secure access point initialized...</p>
+                        <p>Establishing encrypted connection...</p>
+                        <br>
+                        <p>> Enter your credentials to access the network</p>
+                        <br>
+                    </div>
+
+                    <form id="loginForm" class="login-form">
+                        <div class="input-group">
+                            <label for="username">USERNAME:</label>
+                            <input type="text" id="username" name="username" placeholder="Enter username or create new" required autofocus>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">PASSWORD:</label>
+                            <input type="password" id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="login-buttons">
+                            <button type="submit" class="neon-btn">LOGIN</button>
+                            <button type="button" id="signupToggle" class="neon-btn secondary">CREATE ACCOUNT</button>
+                        </div>
+                        <div id="loginError" class="error-message"></div>
+                    </form>
+
+                    <div class="admin-section">
+                        <p class="small-text">Access administrator console? <span id="adminToggle" class="admin-toggle">Click here</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Login Modal -->
+            <div id="adminModal" class="modal hidden">
+                <div class="modal-content terminal-container">
+                    <div class="terminal-header">
+                        <span class="terminal-title">ADMIN_SECURITY_PROTOCOL</span>
+                        <span class="close-modal" id="closeAdminModal">✕</span>
+                    </div>
+                    <div class="terminal-content">
+                        <p>> ADMINISTRATOR ACCESS REQUIRES AUTHENTICATION</p>
+                        <p>> Enter authorization key:</p>
+                        <br>
+                        <div class="input-group">
+                            <input type="password" id="adminPassword" placeholder="Authorization Key" autofocus>
+                        </div>
+                        <button id="adminLoginBtn" class="neon-btn">AUTHENTICATE</button>
+                        <div id="adminError" class="error-message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Screen -->
+        <div id="chatScreen" class="screen">
+            <div class="chat-container">
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        <h2>NETWORK</h2>
+                        <button id="adminPanelBtn" class="admin-btn hidden">ADMIN</button>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar-container">
+                            <img id="userAvatar" src="https://api.dicebear.com/9.x/initials/svg?seed=User" alt="Avatar" class="avatar">
+                        </div>
+                        <div class="profile-info">
+                            <p class="username" id="displayUsername">loading...</p>
+                            <p class="rank" id="displayRank">RANK: NOVICE</p>
+                            <p class="points" id="displayPoints">PTS: 0</p>
+                        </div>
+                    </div>
+                    <div class="sidebar-divider"></div>
+                    <div class="tasks-section">
+                        <h3>TASKS</h3>
+                        <div id="tasksList" class="tasks-list">
+                            <p class="loading">Loading tasks...</p>
+                        </div>
+                    </div>
+                    <div class="sidebar-divider"></div>
+                    <button id="logoutBtn" class="neon-btn logout-btn">LOGOUT</button>
+                </div>
+
+                <div class="main-content">
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <span class="terminal-title">ANON_CHAT_PROTOCOL</span>
+                            <span class="online-indicator">● ONLINE</span>
+                        </div>
+                        <div class="terminal-content chat-content">
+                            <div id="messageContainer" class="message-container">
+                                <div class="system-message">
+                                    <p>> ANON_MESSAGING_SYSTEM initialized</p>
+                                    <p>> Connecting to network...</p>
+                                    <p>> Connection established</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="terminal-footer">
+                            <div id="typingIndicator" class="typing-indicator hidden">
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <form id="messageForm" class="message-form">
+                            <div class="input-wrapper">
+                                <span class="prompt">></span>
+                                <input 
+                                    type="text" 
+                                    id="messageInput" 
+                                    placeholder="Enter message (or /help for commands)"
+                                    autocomplete="off"
+                                >
+                            </div>
+                            <button type="submit" class="neon-btn send-btn">SEND</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="screen">
+            <div class="admin-container">
+                <div class="admin-header">
+                    <h1>ADMIN_CONTROL_PANEL v2.0</h1>
+                    <button id="exitAdminBtn" class="neon-btn">EXIT</button>
+                </div>
+
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="users">USERS</button>
+                    <button class="tab-btn" data-tab="messages">MESSAGES</button>
+                    <button class="tab-btn" data-tab="tasks">TASKS</button>
+                    <button class="tab-btn" data-tab="reports">REPORTS</button>
+                    <button class="tab-btn" data-tab="logs">LOGS</button>
+                </div>
+
+                <div class="admin-content">
+                    <!-- Users Tab -->
+                    <div class="tab-content active" id="usersTab">
+                        <h2>USER MANAGEMENT</h2>
+                        <div class="search-bar">
+                            <input type="text" id="userSearchInput" placeholder="Search users...">
+                        </div>
+                        <div id="usersList" class="admin-table">
+                            <p>Loading users...</p>
+                        </div>
+                    </div>
+
+                    <!-- Messages Tab -->
+                    <div class="tab-content" id="messagesTab">
+                        <h2>MESSAGE LOGS</h2>
+                        <div class="search-bar">
+                            <input type="text" id="messageSearchInput" placeholder="Search messages...">
+                        </div>
+                        <div id="messagesList" class="admin-table">
+                            <p>Loading messages...</p>
+                        </div>
+                    </div>
+
+                    <!-- Tasks Tab -->
+                    <div class="tab-content" id="tasksTab">
+                        <h2>TASK MANAGEMENT</h2>
+                        <div class="task-form">
+                            <input type="text" id="taskTitle" placeholder="Task title">
+                            <textarea id="taskDescription" placeholder="Task description"></textarea>
+                            <input type="number" id="taskPoints" placeholder="Points reward" min="1">
+                            <select id="taskAssignUser">
+                                <option value="">Select user to assign...</option>
+                            </select>
+                            <button class="neon-btn" id="createTaskBtn">CREATE TASK</button>
+                        </div>
+                        <div id="tasksList" class="admin-table">
+                            <p>Loading tasks...</p>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="tab-content" id="reportsTab">
+                        <h2>USER REPORTS</h2>
+                        <div id="reportsList" class="admin-table">
+                            <p>Loading reports...</p>
+                        </div>
+                    </div>
+
+                    <!-- Logs Tab -->
+                    <div class="tab-content" id="logsTab">
+                        <h2>ADMIN LOGS</h2>
+                        <div id="logsList" class="admin-table">
+                            <p>Loading logs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="chat.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
