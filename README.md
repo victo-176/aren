@@ -39,6 +39,39 @@ A complete web application that looks and behaves like a hacker-style terminal i
 - MongoDB (local or hosted)
 - npm or yarn package manager
 
+## 🚀 Quick Start (5 Minutes)
+
+```bash
+# 1. Clone and navigate
+git clone https://github.com/victo-176/aren.git
+cd aren
+
+# 2. Install backend
+cd backend && npm install && cd ..
+
+# 3. Start MongoDB (in separate terminal/window)
+mongod
+
+# 4. Start Node backend (in new terminal, from aren/backend)
+npm run dev
+
+# 5. Start frontend (in another new terminal, from aren/frontend)
+python -m http.server 5500
+# OR: npx http-server . -p 5500
+
+# 6. Open browser
+# Visit: http://localhost:5500
+```
+
+**First login:** Leave username blank, enter any password, click LOGIN
+
+**Admin access:** Click "Admin?" → Enter password `Anon123##`
+
+## 📖 Detailed Guides
+
+- **[SETUP.md](SETUP.md)** - Complete local setup with troubleshooting & development workflow
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deploy to Heroku, Railway, Render, or DigitalOcean
+
 ## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
@@ -64,7 +97,7 @@ NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/aren
 JWT_SECRET=your_secret_key_here
-ADMIN_PASSWORD=********
+ADMIN_PASSWORD=Anon123##
 CORS_ORIGIN=http://localhost:5500
 CLIENT_URL=http://localhost:5500
 ```
@@ -81,22 +114,16 @@ mongod
 ```bash
 # From backend directory
 npm run dev    # Using nodemon for development
-# or
-npm start      # Production
 ```
 
 Server will run on `http://localhost:3000`
 
-### 6. Open Frontend
-
-Open `frontend/index.html` in your browser or serve it via a local server:
+### 6. Start Frontend
 
 ```bash
-# Using Python
-python -m http.server 5500 --directory frontend
-
-# Or using Node's http-server
-npx http-server frontend -p 5500
+cd frontend
+python -m http.server 5500
+# OR: npx http-server . -p 5500
 ```
 
 Access the app at `http://localhost:5500`
