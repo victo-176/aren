@@ -58,7 +58,7 @@ NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/aren
 JWT_SECRET=your_secret_key_here_CHANGE_THIS
-ADMIN_PASSWORD=Anon123##
+ADMIN_PASSWORD=your_secret_admin_password
 CORS_ORIGIN=http://localhost:5500
 CLIENT_URL=http://localhost:5500
 ```
@@ -262,8 +262,8 @@ MONGODB_URI=mongodb://localhost:27017/aren
 # JWT (keep secret!)
 JWT_SECRET=dev_secret_key_change_in_production_12345
 
-# Admin
-ADMIN_PASSWORD=Anon123##
+# Admin - Set your own SECRET password
+ADMIN_PASSWORD=your_secret_admin_password
 
 # CORS & Frontend
 CORS_ORIGIN=http://localhost:5500
@@ -364,7 +364,7 @@ Serving HTTP on http://localhost:5500
 
 1. **Access Admin:**
    - On login screen, click "Admin?"
-   - Enter password: `Anon123##`
+   - Enter your secret admin password (set in `.env`)
    - Click AUTHENTICATE
 
 2. **View Users:**
@@ -495,9 +495,10 @@ npm run dev  # Restart
 
 **Admin password not working**
 
-1. Default: `Anon123##`
-2. Change in `backend/.env` if needed
-3. Restart backend server
+1. Check the ADMIN_PASSWORD you set in `backend/.env`
+2. Make sure you're entering the correct password
+3. Ensure backend server has been restarted after changing it
+4. Check backend logs for authentication errors
 
 ## 📚 Development Tips
 

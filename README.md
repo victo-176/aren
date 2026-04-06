@@ -65,7 +65,7 @@ python -m http.server 5500
 
 **First login:** Leave username blank, enter any password, click LOGIN
 
-**Admin access:** Click "Admin?" → Enter password `Anon123##`
+**Admin access:** Click "Admin?" → Enter your secret admin password (configured in .env)
 
 ## 📖 Detailed Guides
 
@@ -97,7 +97,7 @@ NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/aren
 JWT_SECRET=your_secret_key_here
-ADMIN_PASSWORD=Anon123##
+ADMIN_PASSWORD=your_secret_admin_password
 CORS_ORIGIN=http://localhost:5500
 CLIENT_URL=http://localhost:5500
 ```
@@ -371,7 +371,7 @@ The application is fully responsive:
 
 ### Admin Login Issues
 - Verify ADMIN_PASSWORD is set in `.env`
-- Default password is `Anon123##`
+- Admin password should be a strong, secret value configured by you
 - Check admin login endpoint: `POST /api/auth/admin-login`
 
 ### WebSocket Connection Issues
