@@ -59,10 +59,22 @@ const admin = (() => {
                 fetch(`${API_URL}/admin/logs`, { headers })
             ]);
 
-            if (usersRes.ok) allUsers = await usersRes.json();
-            if (messagesRes.ok) allMessages = await messagesRes.json();
-            if (tasksRes.ok) allTasks = await tasksRes.json();
-            if (reportsRes.ok) allReports = await reportsRes.json();
+            if (usersRes.ok) {
+                const data = await usersRes.json();
+                allUsers = data.users || data;
+            }
+            if (messagesRes.ok) {
+                const data = await messagesRes.json();
+                allMessages = data.messages || data;
+            }
+            if (tasksRes.ok) {
+                const data = await tasksRes.json();
+                allTasks = data.tasks || data;
+            }
+            if (reportsRes.ok) {
+                const data = await reportsRes.json();
+                allReports = data.reports || data;
+            }
             if (logsRes.ok) allLogs = await logsRes.json();
 
             // Display active tab
@@ -132,19 +144,19 @@ const admin = (() => {
                 </div>
                 <div class="table-cell">
                     <label>Status</label>
-                    <value>${user.suspended ? 'SUSPENDED' : 'ACTIVE'}</value>
+                    <value>${user.status === 'suspended' ? 'SUSPENDED' : user.status === 'banned' ? 'BANNED' : 'ACTIVE'}</value>
                 </div>
                 <div class="table-cell">
                     <label>Actions</label>
                     <div class="action-buttons">
-                        <button class="action-btn" onclick="admin.editUser('${user.id}')">EDIT</button>
-                        <button class="action-btn" onclick="admin.changeRank('${user.id}', '${user.username}')">RANK</button>
-                        <button class="action-btn" onclick="admin.addPoints('${user.id}', '${user.username}')">+PTS</button>
-                        ${user.suspended ? 
-                            `<button class="action-btn" onclick="admin.unsuspendUser('${user.id}')">UNSUSPEND</button>` :
-                            `<button class="action-btn danger" onclick="admin.suspendUser('${user.id}')">SUSPEND</button>`
+                        <button class="action-btn" onclick="admin.editUser('${user._id}')">EDIT</button>
+                        <button class="action-btn" onclick="admin.changeRank('${user._id}', '${user.username}')">RANK</button>
+                        <button class="action-btn" onclick="admin.addPoints('${user._id}', '${user.username}')">+PTS</button>
+                        ${user.status === 'suspended' ? 
+                            `<button class="action-btn" onclick="admin.suspendUser('${user._id}')">UNSUSPEND</button>` :
+                            `<button class="action-btn danger" onclick="admin.suspendUser('${user._id}')">SUSPEND</button>`
                         }
-                        <button class="action-btn danger" onclick="admin.blockUser('${user.id}')">BLOCK</button>
+                        <button class="action-btn danger" onclick="admin.blockUser('${user._id}')">BLOCK</button>
                     </div>
                 </div>
             </div>
@@ -163,15 +175,15 @@ const admin = (() => {
     };
 
     const changeRank = async (userId, username) => {
-        const ranks = ['NOVICE', 'MEMBER', 'VETERAN', 'ELITE', 'LEGEND', 'ADMIN'];
-        const currentRank = allUsers.find(u => u.id === userId)?.rank;
+        const ranks = ['Newbie', 'Hacker', 'Elite', 'Legend'];
+        const currentRank = allUsers.find(u => u._id === userId)?.rank;
         const rank = prompt(`New rank for ${username} (${ranks.join(', ')}):`, currentRank);
 
         if (!rank || !ranks.includes(rank)) return;
 
         try {
-            const response = await fetch(`${API_URL}/admin/users/${userId}`, {
-                method: 'PATCH',
+            const response = await fetch(`${API_URL}/admin/users/${userId}/rank`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${auth.getToken()}`
@@ -192,8 +204,8 @@ const admin = (() => {
         if (!points || isNaN(points)) return;
 
         try {
-            const response = await fetch(`${API_URL}/admin/users/${userId}`, {
-                method: 'PATCH',
+            const response = await fetch(`${API_URL}/admin/users/${userId}/points`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${auth.getToken()}`
@@ -230,7 +242,7 @@ const admin = (() => {
 
     const unsuspendUser = async (userId) => {
         try {
-            const response = await fetch(`${API_URL}/admin/users/${userId}/unsuspend`, {
+            const response = await fetch(`${API_URL}/admin/users/${userId}/unban`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${auth.getToken()}`
@@ -246,10 +258,10 @@ const admin = (() => {
     };
 
     const blockUser = async (userId) => {
-        if (!confirm('Permanently block this user? This cannot be undone!')) return;
+        if (!confirm('Permanently ban this user? This cannot be undone!')) return;
 
         try {
-            const response = await fetch(`${API_URL}/admin/users/${userId}/block`, {
+            const response = await fetch(`${API_URL}/admin/users/${userId}/ban`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${auth.getToken()}`
@@ -260,7 +272,7 @@ const admin = (() => {
                 loadAllData();
             }
         } catch (error) {
-            console.error('Error blocking user:', error);
+            console.error('Error banning user:', error);
         }
     };
 
@@ -277,7 +289,7 @@ const admin = (() => {
             <div class="table-row">
                 <div class="table-cell">
                     <label>User</label>
-                    <value>${msg.user.username}</value>
+                    <value>${msg.sender.username}</value>
                 </div>
                 <div class="table-cell">
                     <label>Message</label>
@@ -290,7 +302,7 @@ const admin = (() => {
                 <div class="table-cell">
                     <label>Actions</label>
                     <div class="action-buttons">
-                        <button class="action-btn danger" onclick="admin.deleteMessage('${msg.id}')">DELETE</button>
+                        <button class="action-btn danger" onclick="admin.deleteMessage('${msg._id}')">DELETE</button>
                     </div>
                 </div>
             </div>
@@ -301,7 +313,7 @@ const admin = (() => {
         const search = document.getElementById('messageSearchInput').value.toLowerCase();
         const filtered = allMessages.filter(m => 
             m.content.toLowerCase().includes(search) || 
-            m.user.username.toLowerCase().includes(search)
+            m.sender.username.toLowerCase().includes(search)
         );
         
         const container = document.getElementById('messagesList');
@@ -315,7 +327,7 @@ const admin = (() => {
         if (!confirm('Delete this message?')) return;
 
         try {
-            const response = await fetch(`${API_URL}/admin/messages/${messageId}`, {
+            const response = await fetch(`${API_URL}/messages/${messageId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${auth.getToken()}`
@@ -347,7 +359,7 @@ const admin = (() => {
                 </div>
                 <div class="table-cell">
                     <label>Points</label>
-                    <value>${task.points}</value>
+                    <value>${task.pointsReward}</value>
                 </div>
                 <div class="table-cell">
                     <label>Assigned To</label>
@@ -355,12 +367,12 @@ const admin = (() => {
                 </div>
                 <div class="table-cell">
                     <label>Status</label>
-                    <value>${task.completed ? 'COMPLETED' : 'PENDING'}</value>
+                    <value>${task.status === 'completed' ? 'COMPLETED' : 'PENDING'}</value>
                 </div>
                 <div class="table-cell">
                     <label>Actions</label>
                     <div class="action-buttons">
-                        <button class="action-btn danger" onclick="admin.deleteTask('${task.id}')">DELETE</button>
+                        <button class="action-btn danger" onclick="admin.deleteTask('${task._id}')">DELETE</button>
                     </div>
                 </div>
             </div>
@@ -388,8 +400,8 @@ const admin = (() => {
                 body: JSON.stringify({
                     title,
                     description,
-                    points,
-                    assignedToId: assignedToId || null
+                    pointsReward: points,
+                    assignedTo: assignedToId || null
                 })
             });
 
@@ -449,12 +461,12 @@ const admin = (() => {
                 </div>
                 <div class="table-cell">
                     <label>Status</label>
-                    <value>${report.resolved ? 'RESOLVED' : 'PENDING'}</value>
+                    <value>${report.status === 'resolved' ? 'RESOLVED' : 'OPEN'}</value>
                 </div>
                 <div class="table-cell">
                     <label>Actions</label>
                     <div class="action-buttons">
-                        <button class="action-btn" onclick="admin.resolveReport('${report.id}')">RESOLVE</button>
+                        <button class="action-btn" onclick="admin.resolveReport('${report._id}')">RESOLVE</button>
                     </div>
                 </div>
             </div>
@@ -463,11 +475,13 @@ const admin = (() => {
 
     const resolveReport = async (reportId) => {
         try {
-            const response = await fetch(`${API_URL}/admin/reports/${reportId}/resolve`, {
-                method: 'POST',
+            const response = await fetch(`${API_URL}/reports/${reportId}/resolve`, {
+                method: 'PUT',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${auth.getToken()}`
-                }
+                },
+                body: JSON.stringify({ status: 'resolved' })
             });
 
             if (response.ok) {
@@ -512,7 +526,7 @@ const admin = (() => {
     const populateUserSelect = () => {
         const select = document.getElementById('taskAssignUser');
         select.innerHTML = '<option value="">Select user to assign...</option>' +
-            allUsers.map(user => `<option value="${user.id}">${user.username}</option>`).join('');
+            allUsers.map(user => `<option value="${user._id}">${user.username}</option>`).join('');
     };
 
     const editUser = (userId) => {

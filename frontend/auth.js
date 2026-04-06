@@ -76,7 +76,7 @@ const auth = (() => {
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
             // Check if user is admin
-            if (currentUser.role === 'admin') {
+            if (currentUser.isAdmin) {
                 document.getElementById('adminPanelBtn').classList.remove('hidden');
             }
 

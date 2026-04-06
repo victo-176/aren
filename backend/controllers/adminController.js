@@ -256,3 +256,76 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 };
+
+// Get all messages (admin)
+exports.getAllMessages = async (req, res) => {
+  try {
+    const { limit = 100, skip = 0 } = req.query;
+
+    const messages = await Message.find()
+      .populate('sender.id', 'username avatar rank')
+      .sort({ createdAt: -1 })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    const total = await Message.countDocuments();
+
+    res.json({
+      messages,
+      total,
+    });
+  } catch (error) {
+    console.error('[GET_ALL_MESSAGES_ERROR]', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+};
+
+// Get all tasks (admin)
+exports.getAllTasks = async (req, res) => {
+  try {
+    const { status, limit = 100, skip = 0 } = req.query;
+    const filter = {};
+
+    if (status) filter.status = status;
+
+    const tasks = await Task.find(filter)
+      .populate('assignedTo', 'username avatar rank')
+      .sort({ createdAt: -1 })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    const total = await Task.countDocuments(filter);
+
+    res.json({
+      tasks,
+      total,
+    });
+  } catch (error) {
+    console.error('[GET_ALL_TASKS_ERROR]', error);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+};
+
+// Get all reports (admin)
+exports.getAllReports = async (req, res) => {
+  try {
+    const { status = 'open', limit = 100, skip = 0 } = req.query;
+
+    const reports = await Report.find({ status })
+      .populate('reportedUser', 'username avatar rank')
+      .populate('reportedBy', 'username')
+      .sort({ createdAt: -1 })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    const total = await Report.countDocuments({ status });
+
+    res.json({
+      reports,
+      total,
+    });
+  } catch (error) {
+    console.error('[GET_ALL_REPORTS_ERROR]', error);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+};

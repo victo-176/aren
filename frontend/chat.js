@@ -25,11 +25,11 @@ const chat = (() => {
             addSystemMessage('Connected to network');
         });
 
-        socket.on('message', (data) => {
+        socket.on('new-message', (data) => {
             addMessage(data);
         });
 
-        socket.on('typing', (data) => {
+        socket.on('user-typing', (data) => {
             showTypingIndicator(data);
         });
 
@@ -107,10 +107,10 @@ const chat = (() => {
         }
 
         tasksList.innerHTML = tasks.map(task => `
-            <div class="task-item ${task.completed ? 'completed' : ''}">
+            <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
                 <div class="title">${task.title}</div>
                 <div class="description">${task.description}</div>
-                <div class="reward">Reward: ${task.points} points</div>
+                <div class="reward">Reward: ${task.pointsReward} points</div>
             </div>
         `).join('');
 
@@ -122,16 +122,18 @@ const chat = (() => {
 
     const completeTask = async (taskId) => {
         try {
-            const response = await fetch(`${API_URL}/tasks/${taskId}/complete`, {
-                method: 'POST',
+            const response = await fetch(`${API_URL}/tasks/${taskId}/status`, {
+                method: 'PUT',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${auth.getToken()}`
-                }
+                },
+                body: JSON.stringify({ status: 'completed' })
             });
 
             if (response.ok) {
                 const result = await response.json();
-                addSystemMessage(`Task completed! +${result.pointsEarned} points`);
+                addSystemMessage(`Task completed! +${result.pointsReward} points`);
                 loadTasks();
                 loadUserData();
             }
@@ -148,7 +150,7 @@ const chat = (() => {
         
         input.addEventListener('input', () => {
             if (socket) {
-                socket.emit('typing', {
+                socket.emit('user-typing', {
                     username: auth.getCurrentUser().username
                 });
             }
@@ -269,7 +271,7 @@ Available commands:
         const timestamp = new Date(messageData.createdAt).toLocaleTimeString();
         
         messageEl.innerHTML = `
-            <div class="message-user">${messageData.user.username} [${messageData.user.rank}]</div>
+            <div class="message-user">${messageData.sender.username} [${messageData.sender.rank}]</div>
             <div class="message-content">${escapeHtml(messageData.content)}</div>
             <div class="message-timestamp">${timestamp}</div>
         `;
