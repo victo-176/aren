@@ -64,7 +64,7 @@ NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/aren
 JWT_SECRET=your_secret_key_here
-ADMIN_PASSWORD=Anon123##
+ADMIN_PASSWORD=********
 CORS_ORIGIN=http://localhost:5500
 CLIENT_URL=http://localhost:5500
 ```
@@ -146,7 +146,7 @@ Access the app at `http://localhost:5500`
 ### Admin Access
 
 1. On login screen, click "Admin?"
-2. Enter admin password: `Anon123##`
+2. Enter admin password: `**************`
 3. Access the admin panel with tabs for:
    - **USERS** - Manage all users
    - **MESSAGES** - View and delete messages
