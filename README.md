@@ -71,6 +71,7 @@ python -m http.server 5500
 
 - **[SETUP.md](SETUP.md)** - Complete local setup with troubleshooting & development workflow
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deploy to Heroku, Railway, Render, or DigitalOcean
+- **[ADMIN_PASSWORD_SETUP.md](ADMIN_PASSWORD_SETUP.md)** - How to securely set your secret admin password
 
 ## 🚀 Installation & Setup
 
